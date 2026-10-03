@@ -509,6 +509,21 @@ export class Vec2
         return a.Copy().LerpInPlace(b, t);
     }
     ///-----------------------------------------------------------------------///
+
+
+    ///-----------------------------------------------------------------------///
+    //LerpInPlace(a, b, t)
+    //@param a the first vector
+    //@param b the second vector
+    //@param t the interpolation factor (0 <= t <= 1)
+    //@return this, after being linearly interpolated between a and b by t
+    static LerpInPlace(a, b, t)
+    {
+        this.x = Lerp(a.x, b.x, t);
+        this.y = Lerp(a.y, b.y, t);
+        return this;
+    }
+    ///-----------------------------------------------------------------------///
 }
 //End of Vec2 class
 ///-----------------------------------------------------------------------///
