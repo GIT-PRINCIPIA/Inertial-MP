@@ -25,6 +25,10 @@ async function StartInertial()
 
     let core = new Core(null); //Replace null with config
 
+    let client = new Client(core.inputQueue.Reader(), core.outputQueue.Writer());
+
+    core.onFixedUpdate.Subscribe(client.FixedUpdate.bind(client));
+
     let inputFeeder = new InputFeeder(core.inputQueue.Writer());
 
     //Couple server to core
@@ -33,9 +37,7 @@ async function StartInertial()
 
     core.onFixedUpdate.Subscribe(server.FixedUpdate.bind(server));
 
-    //Client
-    let client = new Client(core.inputQueue.Reader(), core.outputQueue.Writer());
-    client.gameState = server.simulation.gameState; //Because I haven't implemented game state patching yet
+
 
     //Camera
     let camera = new Camera(new Vec2(10, 10), server.simulation.gameState.players[0].pos, 1);

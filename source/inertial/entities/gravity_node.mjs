@@ -16,9 +16,9 @@ export class GravityNode extends StaticEntity
     //@param mass the GravityNode's mass
     //@param regenMult the strength of the GravityNode's regeneration effect
     //@param regenDoubleDist the distance at which the GravityNode's regeneration effect has doubled
-    constructor(id, pos, mass, regenMult, regenDoubleDist)
+    constructor(id, {pos, mass, regenMult, regenDoubleDist})
     {
-        super(id, pos);
+        super(id, "gravityNode", pos);
         this.mass = mass;
         this.regenMult = regenMult;
         this.regenDoubleDist = regenDoubleDist;

@@ -29,6 +29,16 @@ export class MessageQueueReader
 
 
     ///-----------------------------------------------------------------------///
+    //Empty()
+    //@return true if empty, false otherwise
+    Empty()
+    {
+        return this.queue.queue.length == 0;
+    }
+    ///-----------------------------------------------------------------------///
+
+
+    ///-----------------------------------------------------------------------///
     //Pop()
     //@return the first item in the message queue, removing it in the process
     Pop()

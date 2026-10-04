@@ -9,11 +9,13 @@
 export class Entity
 {
     ///-----------------------------------------------------------------------///
-    //constructor(id)
+    //constructor(id, type)
     //@param id the id of the entity
-    constructor(id)
+    //@param type the type of entity
+    constructor(id, type)
     {
         this.id = id;
+        this.type = type;
     }
     ///-----------------------------------------------------------------------///
 }
@@ -26,12 +28,13 @@ export class Entity
 export class StaticEntity extends Entity 
 {
     ///-----------------------------------------------------------------------///
-    //constructor(id, pos)
+    //constructor(id, type, pos)
     //@param id the id of the entity
+    //@param type the type of entity
     //@param pos the position of the entity
-    constructor(id, pos)
+    constructor(id, type, pos)
     {
-        super(id);
+        super(id, type);
         this.pos = pos;
     }
     ///-----------------------------------------------------------------------///
@@ -44,13 +47,14 @@ export class StaticEntity extends Entity
 export class DynamicEntity extends StaticEntity
 {
     ///-----------------------------------------------------------------------///
-    //constructor(id, pos, vel)
+    //constructor(id, type, pos, vel)
     //@param id the id of the entity
+    //@param type the type of entity
     //@param pos the position of the entity
     //@param vel the velocity of the entity
-    constructor(id, pos, vel)
+    constructor(id, type, pos, vel)
     {
-        super(id, pos);
+        super(id, type, pos);
         this.vel = vel;
     }
     ///-----------------------------------------------------------------------///

@@ -4,6 +4,7 @@
 ///-----------------------------------------------------------------------///
 
 import { GameState } from "./Simulation/game_state.mjs";
+import { GameStatePatcher } from "./simulation/game_state_patcher.mjs";
 
 ///-----------------------------------------------------------------------///
 //Client class
@@ -16,6 +17,30 @@ export class Client
     constructor(input, output)
     {
         this.gameState = new GameState();
+        this.input = input;
+        this.output = output;
+    }
+    ///-----------------------------------------------------------------------///
+
+
+    ///-----------------------------------------------------------------------///
+    //FixedUpdate(dt)
+    //@param dt delta time / timestep
+    FixedUpdate(dt)
+    {
+        while (!this.input.Empty())
+        {
+            const MSG = this.input.Pop();
+            const TYPE = MSG.type;
+            const PAYLOAD = MSG.msg;
+
+            switch (TYPE)
+            {
+                case "PATCH":
+                    GameStatePatcher.Patch(this.gameState, PAYLOAD);
+                break;
+            }
+        }
     }
     ///-----------------------------------------------------------------------///
 }

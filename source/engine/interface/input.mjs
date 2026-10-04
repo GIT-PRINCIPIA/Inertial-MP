@@ -18,8 +18,9 @@ export class InputFeeder
 
         this.Register("keydown", (event) =>
         {
-            this.output.Write({
-                type: "keyDown",
+            this.output.Write(
+                "keyDown",
+                {
                 key: event.key,
                 code: event.code,
                 repeat: event.repeat
@@ -28,8 +29,9 @@ export class InputFeeder
 
         this.Register("keyup", (event) =>
         {
-            this.output.Write({
-                type: "keyUp",
+            this.output.Write(
+                "keyUp",
+                {
                 key: event.key,
                 code: event.code
             });
@@ -37,8 +39,9 @@ export class InputFeeder
 
         this.Register("click", (event) =>
         {
-            this.output.Write({
-                type: "mouseClick",
+            this.output.Write(
+                "mouseClick",
+                {
                 button: event.button,
                 clientX: event.clientX,
                 clientY: event.clientY,
@@ -48,8 +51,9 @@ export class InputFeeder
 
         this.Register("wheel", (event) =>
         {
-            this.output.Write({
-                type: "scroll",
+            this.output.Write(
+                "scroll",
+                {
                 deltaX: event.deltaX,
                 deltaY: event.deltaY,
                 deltaZ: event.deltaZ,

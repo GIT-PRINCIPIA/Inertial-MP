@@ -18,9 +18,9 @@ export class Player extends DynamicEntity
     //@param rot the rotation of the player
     //@param angVel the angular velocity of the player
     //@param shipConfig the ship's configuration (mass, etc)
-    constructor(id, pos, vel, rot, angVel, shipConfig)
+    constructor(id, {pos, vel, rot, angVel, shipConfig})
     {
-        super(id, pos, vel);
+        super(id, "player", pos, vel);
         this.rot = rot;
         this.angVel = angVel;
         this.shipConfig = shipConfig;

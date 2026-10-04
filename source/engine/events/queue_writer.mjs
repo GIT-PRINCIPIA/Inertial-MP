@@ -19,11 +19,12 @@ export class MessageQueueWriter
 
 
     ///-----------------------------------------------------------------------///
-    //Write(message)
+    //Write(type, message)
+    //@param type the message type, used for parsing
     //@param message the message to add to the MessageQueue
-    Write(message)
+    Write(type, message)
     {
-        this.queue.queue.push(message);
+        this.queue.queue.push({type: type, msg: message});
     }
     ///-----------------------------------------------------------------------///
 }
