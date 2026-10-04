@@ -41,7 +41,7 @@ export class StaticEntity extends Entity
 
 ///-----------------------------------------------------------------------///
 //DynamicEntity class
-export class DynamicEntity extends Entity
+export class DynamicEntity extends StaticEntity
 {
     ///-----------------------------------------------------------------------///
     //constructor(id, pos, vel)
