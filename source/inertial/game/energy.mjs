@@ -51,7 +51,7 @@ export class Energy
 
         const ENERGY_REGENERATION_RATE =
             Energy.BASE_REGEN_RATE *
-            (1 + gravityNode.regenStrength * REGEN_INFLUENCE);
+            (1 + gravityNode.regenMult * REGEN_INFLUENCE);
 
         return ENERGY_REGENERATION_RATE;
     }

@@ -15,8 +15,8 @@ export class MessageQueue
     constructor()
     {
         this.queue = [];
-        this.reader = new MessageQueueReader();
-        this.writer = new MessageQueueWriter();
+        this.reader = new MessageQueueReader(this);
+        this.writer = new MessageQueueWriter(this);
     }
     ///-----------------------------------------------------------------------///
 

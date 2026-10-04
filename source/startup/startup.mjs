@@ -14,6 +14,7 @@ import { Renderer } from "../inertial/rendering/renderer.mjs";
 import { Client } from "../inertial/game/client.mjs";
 import { Camera } from "../engine/rendering/camera.mjs";
 import { Vec2 } from "../utility/vector.mjs";
+import { InputFeeder } from "../engine/interface/input.mjs";
 
 ///-----------------------------------------------------------------------///
 //StartInertial()
@@ -23,6 +24,8 @@ async function StartInertial()
     Logger.logger = new ConsoleLogger();
 
     let core = new Core(null); //Replace null with config
+
+    let inputFeeder = new InputFeeder(core.inputQueue.Writer());
 
     //Couple server to core
     //For now, we are using a local server, so it accesses Core's input and output queues directly
@@ -48,7 +51,7 @@ async function StartInertial()
     console.dir(renderer);
 
     core.onRender.Subscribe(()=>{renderer.DrawScene(camera, client.gameState);});
-    window.addEventListener('resize', canvas.Resize);
+    window.addEventListener('resize', canvas.Resize.bind(canvas));
     StartGameLoop(core);
 }
 ///-----------------------------------------------------------------------///

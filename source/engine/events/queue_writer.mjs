@@ -23,7 +23,7 @@ export class MessageQueueWriter
     //@param message the message to add to the MessageQueue
     Write(message)
     {
-        this.queue.push(message);
+        this.queue.queue.push(message);
     }
     ///-----------------------------------------------------------------------///
 }
