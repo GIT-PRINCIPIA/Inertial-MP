@@ -29,8 +29,6 @@ export class Simulation
         for (const PLAYER of this.gameState.players)
         {
             PlayerSimulation.UpdatePlayer(PLAYER, dt, this.gameState);
-            console.log("Player pos: " + PLAYER.pos.ToString());
-            console.log("Player vel: " + PLAYER.vel.ToString());
         }
     }
     ///-----------------------------------------------------------------------///

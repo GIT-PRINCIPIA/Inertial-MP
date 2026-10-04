@@ -5,6 +5,7 @@
 
 import { Vec2 } from "../../utility/vector.mjs";
 import { GravityNode } from "../entities/gravity_node.mjs";
+import { ClientMessage } from "../player/client_message.mjs";
 import { Player } from "../player/player.mjs";
 import { ShipConfig } from "../player/ship_config.mjs";
 import { GameStatePatcher } from "./simulation/game_state_patcher.mjs";
@@ -26,8 +27,11 @@ export class Server
         this.output = output;
         this.simulation = new Simulation();
 
-        this.simulation.gameState.AddEntity(new GravityNode(0, {pos: new Vec2(0, 3), mass: 1, regenMult: 1, regenDoubleDist: 10}));
-        this.simulation.gameState.AddEntity(new Player(1, {pos: new Vec2(0, 0), vel: new Vec2(1.75, 0), rot: 0, angVel: 2, shipConfig: new ShipConfig(1, 0.1)}));
+        this.simulation.gameState.AddEntity(new Player(0, {pos: new Vec2(0, 0), vel: new Vec2(1.75, 0), rot: 0, angVel: 0, shipConfig: new ShipConfig(1, 0.1)}));
+        this.simulation.gameState.AddEntity(new GravityNode(1, {pos: new Vec2(0, 4), mass: 1, regenMult: 1, regenDoubleDist: 10}));
+        this.simulation.gameState.AddEntity(new GravityNode(2, {pos: new Vec2(2, 6), mass: 1, regenMult: 1, regenDoubleDist: 10}));
+        this.simulation.gameState.AddEntity(new GravityNode(3, {pos: new Vec2(-4, 3), mass: 1, regenMult: 1, regenDoubleDist: 10}));
+        this.simulation.gameState.AddEntity(new GravityNode(4, {pos: new Vec2(-2, -3), mass: 1, regenMult: 1, regenDoubleDist: 10}));
     }
     ///-----------------------------------------------------------------------///
 
@@ -38,8 +42,57 @@ export class Server
     FixedUpdate(dt)
     {
         this.simulation.FixedUpdate(dt);
-        this.output.Write("PATCH", GameStatePatcher.GeneratePatch(this.simulation.gameState.players[0]));
-        this.output.Write("PATCH", GameStatePatcher.GeneratePatch(this.simulation.gameState.nodes[0]));
+
+
+        for (const PLAYER of this.simulation.gameState.players)
+        {
+            let patch = GameStatePatcher.GeneratePatch(PLAYER);
+            for (const RECIPIENT of this.simulation.gameState.players)
+            {
+                this.output.Write("PACKET", new ClientMessage(RECIPIENT.id, "PATCH", patch));
+            }
+            
+        }
+        for (const NODE of this.simulation.gameState.nodes)
+        {
+            let patch = GameStatePatcher.GeneratePatch(NODE);
+            for (const RECIPIENT of this.simulation.gameState.players)
+            {
+                this.output.Write("PACKET", new ClientMessage(RECIPIENT.id, "PATCH", patch));
+            }
+        }
+
+        while (!this.input.Empty())
+        {
+            const PACKET = this.input.Pop().msg;
+            const SOURCE = PACKET.source;
+            const MESSAGE = PACKET.message;
+            const TYPE = MESSAGE.type;
+            const DATA = MESSAGE.msg;
+
+            switch (TYPE)
+            {
+                case "INPUT":
+                    const ID = SOURCE;
+                    switch (DATA)
+                    {
+                        case "W":
+                            this.simulation.gameState.players[ID].vel.AddInPlace(Vec2.FromAngle(this.simulation.gameState.players[ID].rot).MultiplyScalarInPlace(0.05));
+                        break;
+                        case "S":
+                            this.simulation.gameState.players[ID].vel.SubtractInPlace(Vec2.FromAngle(this.simulation.gameState.players[ID].rot).MultiplyScalarInPlace(0.05));
+                        break;
+                        case "A":
+                            this.simulation.gameState.players[ID].angVel -= 0.3;
+                        break;
+                        case "D":
+                            this.simulation.gameState.players[ID].angVel += 0.3;
+                        break;
+                    }
+                break;
+            }
+        }
+        
     }
     ///-----------------------------------------------------------------------///
 }

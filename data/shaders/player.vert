@@ -8,15 +8,21 @@ uniform float playerSize;
 uniform vec2 cameraPosition;
 uniform vec2 worldToClip;
 
+out vec2 localPos;
 
 void main()
 {
     float cosine = cos(playerRotation);
     float sine = sin(playerRotation);
+    localPos = vertex;
+
+    vec2 scaledVert = vertex;
+    scaledVert.y *= float(2);
+
 
     vec2 rotatedVertex = vec2(
-        cosine * vertex.x + sine * vertex.y,
-        -sine * vertex.x + cosine * vertex.y
+        cosine * scaledVert.x + sine * scaledVert.y,
+        -sine * scaledVert.x + cosine * scaledVert.y
     );
 
     vec2 worldPosition = playerPosition + rotatedVertex * playerSize;

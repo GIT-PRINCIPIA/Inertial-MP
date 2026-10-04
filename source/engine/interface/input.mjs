@@ -16,32 +16,26 @@ export class InputFeeder
         this.output = output;
         this.listeners = new Map();
 
+        this.keyStatuses = {};
+
         this.Register("keydown", (event) =>
         {
-            this.output.Write(
-                "keyDown",
-                {
-                key: event.key,
-                code: event.code,
-                repeat: event.repeat
-            });
+            this.keyStatuses[event.code] = true;
+            
         });
 
         this.Register("keyup", (event) =>
         {
-            this.output.Write(
-                "keyUp",
-                {
-                key: event.key,
-                code: event.code
-            });
+            this.keyStatuses[event.code] = false;
+            
         });
 
         this.Register("click", (event) =>
         {
             this.output.Write(
-                "mouseClick",
+                "INPUT",
                 {
+                type: "mouseClick",
                 button: event.button,
                 clientX: event.clientX,
                 clientY: event.clientY,
@@ -52,8 +46,9 @@ export class InputFeeder
         this.Register("wheel", (event) =>
         {
             this.output.Write(
-                "scroll",
+                "INPUT",
                 {
+                type: "scroll",
                 deltaX: event.deltaX,
                 deltaY: event.deltaY,
                 deltaZ: event.deltaZ,
@@ -62,6 +57,33 @@ export class InputFeeder
                 clientY: event.clientY
             });
         }, { passive: true });
+    }
+    ///-----------------------------------------------------------------------///
+
+
+    ///-----------------------------------------------------------------------///
+    //Tick()
+    Tick()
+    {
+        //Feed key inputs into inputs queue
+        const KEY_CODES = Object.keys(this.keyStatuses);
+
+        for (const KEY_CODE of KEY_CODES)
+        {
+            const VALUE = this.keyStatuses[KEY_CODE];
+            if (VALUE)
+            {
+                //Key pressed
+                this.output.Write(
+                    "INPUT",
+                    {
+                        type: "key",
+                        code: KEY_CODE
+                    }
+                );
+            }
+
+        }
     }
     ///-----------------------------------------------------------------------///
 

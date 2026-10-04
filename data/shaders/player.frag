@@ -3,8 +3,13 @@
 precision mediump float;
 
 out vec4 outColour;
-
+in vec2 localPos;
 void main()
 {
-	outColour = vec4(1,1,1, 1);
+    vec2 vec = localPos;
+    vec *= vec2(0.5, 0.5);
+    vec += vec2(0.5);
+
+
+	outColour = vec4(0.1,localPos.y + 0.1,localPos.y + 0.1, 1);
 }

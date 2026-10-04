@@ -197,11 +197,11 @@ export class Vec2
 
     ///-----------------------------------------------------------------------///
     //FromAngle(angle)
-    //@param angle the angle to turn into a unit vector
+    //@param angle the clockwise-positive angle in radians
     //@return a unit vector pointing along 'angle'
     static FromAngle(angle)
     {
-        return new Vec2(Math.cos(angle), Math.sin(angle));
+        return new Vec2(Math.cos(angle - Math.PI / 2), -Math.sin(angle - Math.PI / 2));
     }
     ///-----------------------------------------------------------------------///
 
@@ -444,10 +444,10 @@ export class Vec2
     //Angle(a, b)
     //@param a the first vector
     //@param b the second vector
-    //@return the angle in radians FROM a TO b, in the range [-PI, PI]
+    //@return the clockwise-positive angle in radians FROM a TO b, in the range [-PI, PI]
     static Angle(a, b)
     {
-        let angle = Math.atan2(b.y, b.x) - Math.atan2(a.y, a.x);
+        let angle = Math.atan2(a.y, a.x) - Math.atan2(b.y, b.x);
 
         if (angle > Math.PI)
         {
@@ -465,7 +465,7 @@ export class Vec2
 
     ///-----------------------------------------------------------------------///
     //AngleFromX()
-    //@return the angle in radians FROM the positive x-axis TO this vector, in the range [-PI, PI]
+    //@return the clockwise-positive angle in radians FROM the positive x-axis TO this vector, in the range [-PI, PI]
     AngleFromX()
     {
         return Vec2.Angle(Vec2.RIGHT, this);

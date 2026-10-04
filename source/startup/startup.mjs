@@ -15,6 +15,8 @@ import { Client } from "../inertial/game/client.mjs";
 import { Camera } from "../engine/rendering/camera.mjs";
 import { Vec2 } from "../utility/vector.mjs";
 import { InputFeeder } from "../engine/interface/input.mjs";
+import { MessageQueue } from "../engine/events/queue.mjs";
+import { LocalTransport } from "../inertial/networking/local_transport.mjs";
 
 ///-----------------------------------------------------------------------///
 //StartInertial()
@@ -31,9 +33,17 @@ async function StartInertial()
 
     let inputFeeder = new InputFeeder(core.inputQueue.Writer());
 
+    core.onFixedUpdate.Subscribe(inputFeeder.Tick.bind(inputFeeder));
+
     //Couple server to core
     //For now, we are using a local server, so it accesses Core's input and output queues directly
-    let server = new Server(core.outputQueue.Reader(), core.inputQueue.Writer()); //Client output is server input, client input is server output
+    let serverInput = new MessageQueue();
+    let serverOutput = new MessageQueue();
+    let server = new Server(serverInput.Reader(), serverOutput.Writer()); 
+
+    let transport = new LocalTransport(core.outputQueue.Reader(), serverInput.Writer(), serverOutput.Reader(), core.inputQueue.Writer());
+
+    core.onFixedUpdate.Subscribe(transport.Tick.bind(transport));
 
     core.onFixedUpdate.Subscribe(server.FixedUpdate.bind(server));
 
