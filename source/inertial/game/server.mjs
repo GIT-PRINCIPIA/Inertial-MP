@@ -3,6 +3,7 @@
 //The game server, authoritative over game state
 ///-----------------------------------------------------------------------///
 
+import { Lerp, Clamp01 } from "../../utility/scalar.mjs";
 import { Vec2 } from "../../utility/vector.mjs";
 import { GravityNode } from "../entities/gravity_node.mjs";
 import { ClientMessage } from "../player/client_message.mjs";
@@ -74,19 +75,21 @@ export class Server
             {
                 case "INPUT":
                     const ID = SOURCE;
+                    const PLAYER = this.simulation.gameState.players.find((candidate)=>{return candidate.id == ID;});
+
                     switch (DATA)
                     {
                         case "W":
-                            this.simulation.gameState.players[ID].vel.AddInPlace(Vec2.FromAngle(this.simulation.gameState.players[ID].rot).MultiplyScalarInPlace(0.05));
+                            PLAYER.vel.AddInPlace(Vec2.FromAngle(PLAYER.rot).MultiplyScalarInPlace(0.05));
                         break;
                         case "S":
-                            this.simulation.gameState.players[ID].vel.SubtractInPlace(Vec2.FromAngle(this.simulation.gameState.players[ID].rot).MultiplyScalarInPlace(0.05));
+                            PLAYER.vel.SubtractInPlace(Vec2.FromAngle(PLAYER.rot).MultiplyScalarInPlace(0.05));
                         break;
                         case "A":
-                            this.simulation.gameState.players[ID].angVel -= 0.3;
+                            PLAYER.angVel = Lerp(PLAYER.angVel, -4, Clamp01(dt * 10));
                         break;
                         case "D":
-                            this.simulation.gameState.players[ID].angVel += 0.3;
+                            PLAYER.angVel = Lerp(PLAYER.angVel, 4, Clamp01(dt * 10));
                         break;
                     }
                 break;
