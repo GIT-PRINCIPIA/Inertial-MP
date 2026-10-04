@@ -22,13 +22,10 @@ export class PlayerSimulation
         for (const NODE of gameState.nodes)
         {
             const DELTA = NODE.pos.Subtract(player.pos);
+            const SQR_DIST = DELTA.SqrLength();
             const DELTA_NORM = DELTA.Normalize();
-            const FORCE = GravitySimulation.CalculateForce(SQR_DIST, NODE.mass);
-            
+            const ACCELERATIION = GravitySimulation.CalculateAcceleration(SQR_DIST, NODE.mass) * dt;
 
-            //f = ma
-            //a = f / m
-            const ACCELERATIION = FORCE / player.mass;
 
             const ACCELERATIION_VEC = DELTA_NORM.MultiplyScalar(ACCELERATIION);
 

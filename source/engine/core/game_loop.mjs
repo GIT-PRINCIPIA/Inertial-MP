@@ -66,12 +66,14 @@ function Frame(core, time)
     let deltaTime = (time - lastTime) / 1000;
 
     lastTime = time;
+    
+    core.onPollInputs.Fire();
 
     //Prevent a long pause from producing an enormous simulation step.
     deltaTime = Math.min(deltaTime, MAX_FRAME_DELTA_TIME);
 
     accumulator += deltaTime;
-
+    
     while (accumulator >= FIXED_DELTA_TIME)
     {
         core.onFixedUpdate.Fire(FIXED_DELTA_TIME);
@@ -80,7 +82,6 @@ function Frame(core, time)
     }
 
     core.onRender.Fire(deltaTime);
-    core.onPollInputs.Fire();
     core.onDispatchOutputs.Fire();
 
     animationFrameID = requestAnimationFrame((nextTime) =>

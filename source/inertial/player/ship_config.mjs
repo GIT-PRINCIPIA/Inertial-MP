@@ -1,23 +1,21 @@
 ///-----------------------------------------------------------------------///
-//client.mjs
-//Stores client side game state, which is patched by the server
+//ship_config.mjs
+//Handles configuring a ship
 ///-----------------------------------------------------------------------///
 
-import { GameState } from "./Simulation/game_state.mjs";
 
 ///-----------------------------------------------------------------------///
-//Client class
-export class Client
+//ShipConfig class
+export class ShipConfig
 {
     ///-----------------------------------------------------------------------///
-    //constructor(input, output)
-    //@param input the input queue, e.g packets from the server, or keyboard input
-    //@param output the output queue, e.g packets to the server
-    constructor(input, output)
+    //constructor(mass)
+    //@param mass the mass of the ship
+    constructor(mass)
     {
-        this.gameState = new GameState();
+        this.mass = mass;
     }
     ///-----------------------------------------------------------------------///
 }
-//End of Client class
+//End of ShipConfig class
 ///-----------------------------------------------------------------------///
