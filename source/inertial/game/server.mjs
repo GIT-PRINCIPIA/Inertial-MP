@@ -25,8 +25,8 @@ export class Server
         this.output = output;
         this.simulation = new Simulation();
 
-        this.simulation.AddNode(new GravityNode(0, new Vec2(0, 10), 1, 1, 10));
-        this.simulation.AddPlayer(new Player(1, new Vec2(0, 0), new Vec2(0, 0), 0, 0, new ShipConfig(1)));
+        this.simulation.AddNode(new GravityNode(0, new Vec2(0, 3), 1, 1, 10));
+        this.simulation.AddPlayer(new Player(1, new Vec2(0, 0), new Vec2(1.75, 0), 0, 2, new ShipConfig(1, 0.1)));
     }
     ///-----------------------------------------------------------------------///
 

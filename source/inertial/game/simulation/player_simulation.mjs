@@ -3,6 +3,7 @@
 //Handles simulating players. Stateless!
 ///-----------------------------------------------------------------------///
 
+import { Lerp, SmoothStep } from "../../../utility/scalar.mjs";
 import { GravitySimulation } from "./gravity_simulation.mjs";
 
 
@@ -18,6 +19,8 @@ export class PlayerSimulation
     static UpdatePlayer(player, dt, gameState)
     {
         player.pos.AddInPlace(player.vel.MultiplyScalar(dt));
+        player.rot += player.angVel * dt;
+        player.angVel = Lerp(player.angVel, 0, dt * 3);
 
         for (const NODE of gameState.nodes)
         {

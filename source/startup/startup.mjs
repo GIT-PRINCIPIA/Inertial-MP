@@ -17,7 +17,7 @@ import { Vec2 } from "../utility/vector.mjs";
 
 ///-----------------------------------------------------------------------///
 //StartInertial()
-function StartInertial()
+async function StartInertial()
 {
     //First, initialize the logger service
     Logger.logger = new ConsoleLogger();
@@ -32,7 +32,7 @@ function StartInertial()
 
     //Client
     let client = new Client(core.inputQueue.Reader(), core.outputQueue.Writer());
-    client.gameState = server.gameState; //Because I haven't implemented game state patching yet
+    client.gameState = server.simulation.gameState; //Because I haven't implemented game state patching yet
 
     //Camera
     let camera = new Camera(new Vec2(10, 10), server.simulation.gameState.players[0].pos, 1);
@@ -44,10 +44,11 @@ function StartInertial()
     let renderService = new RenderService(canvas, backend);
     console.dir(renderService);
     let renderer = new Renderer(canvas, renderService);
+    await renderer.Initialize();
     console.dir(renderer);
 
     core.onRender.Subscribe(()=>{renderer.DrawScene(camera, client.gameState);});
-    
+    window.addEventListener('resize', canvas.Resize);
     StartGameLoop(core);
 }
 ///-----------------------------------------------------------------------///

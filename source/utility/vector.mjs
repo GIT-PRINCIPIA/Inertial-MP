@@ -371,6 +371,16 @@ export class Vec2
 
 
     ///-----------------------------------------------------------------------///
+    //ToArray()
+    //@return an array representation of this vector
+    ToArray()
+    {
+        return [this.x, this.y];
+    }
+    ///-----------------------------------------------------------------------///
+
+
+    ///-----------------------------------------------------------------------///
     //Equals(other)
     //@param other the other vector to compare to this
     //@return true if this vector is equal to other, false otherwise

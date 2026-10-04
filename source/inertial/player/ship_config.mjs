@@ -9,11 +9,13 @@
 export class ShipConfig
 {
     ///-----------------------------------------------------------------------///
-    //constructor(mass)
+    //constructor(mass, size)
     //@param mass the mass of the ship
-    constructor(mass)
+    //@param size the size of the ship
+    constructor(mass, size)
     {
         this.mass = mass;
+        this.size = size;
     }
     ///-----------------------------------------------------------------------///
 }

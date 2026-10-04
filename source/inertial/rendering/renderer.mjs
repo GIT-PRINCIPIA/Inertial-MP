@@ -3,6 +3,8 @@
 //Inertial game facing render API
 ///-----------------------------------------------------------------------///
 
+import { Colour } from "../../utility/colour.mjs";
+import { FileService } from "../../utility/file_reader.mjs";
 import { Vec2 } from "../../utility/vector.mjs";
 
 
@@ -18,21 +20,38 @@ export class Renderer
     {
         this.canvas = canvas;
         this.renderService = renderService;
+
+        
     }
     ///-----------------------------------------------------------------------///
 
 
     ///-----------------------------------------------------------------------///
-    //DrawVertices(camera, vertices)
-    //@param camera the camera to use to render
-    //@param vertices the vertices that make up the mesh to draw
-    DrawVertices(camera, vertices)
+    //Initialize()
+    async Initialize()
     {
-        for (var vertex of vertices)
-        {
-            vertex = camera.WorldToScreen(vertex, this.canvas);
-        }
-        this.renderService.DrawVertices(vertices);
+        let gravityNodeVert = await (await FileService.LoadFile("./data/shaders/gravity_node.vert")).text();
+        let gravityNodeFrag = await (await FileService.LoadFile("./data/shaders/gravity_node.frag")).text();
+        
+        this.gravityNodeProgram = this.renderService.CreateProgram(gravityNodeVert, gravityNodeFrag);
+
+
+        let playerVert = await(await FileService.LoadFile("./data/shaders/player.vert")).text();
+        let playerFrag = await(await FileService.LoadFile("./data/shaders/player.frag")).text();
+
+        this.playerProgram = this.renderService.CreateProgram(playerVert, playerFrag);
+
+        let quadVertices = [
+            -1, -1,
+            -1, 1,
+            1, -1,
+
+            -1, 1,
+            1, 1,
+            1, -1
+        ];
+
+        this.quadMesh = this.renderService.CreateMesh(quadVertices);
     }
     ///-----------------------------------------------------------------------///
 
@@ -43,21 +62,49 @@ export class Renderer
     //@param gameState the current GameState to render
     DrawScene(camera, gameState)
     {
-        let vertices = 
-        [
-            -1, -1,
-            -1, 1,
-            1, 1,
-            1, -1
+
+        const pixelsPerWorldUnit =
+            Math.min(this.canvas.width, this.canvas.height) /
+            Math.min(camera.size.x, camera.size.y);
+
+        const worldToClip = [
+            2 * camera.zoom * pixelsPerWorldUnit / this.canvas.width,
+            2 * camera.zoom * pixelsPerWorldUnit / this.canvas.height
         ];
-        for (var i = 0; i < vertices.length; i+= 2)
+
+        this.renderService.ClearScreen(Colour.RGB(0,0,0));
+        this.renderService.SetProgram(this.gravityNodeProgram);
+
+        this.renderService.SetUniform("cameraPosition", camera.pos.ToArray());
+        this.renderService.SetUniform("worldToClip", worldToClip);
+
+        for (var n = 0; n < gameState.nodes.length; n++)
         {
-            let vertex = new Vec2(vertices[i], vertices[i+1]);
-            vertex = camera.WorldToScreen(vertex, this.canvas);
-            vertices[i] = vertex.x;
-            vertices[i+1] = vertex.y;
+            const NODE = gameState.nodes[n];
+            this.renderService.SetUniform("nodePosition", NODE.pos.ToArray());
+            this.renderService.SetUniform("nodeRadius", NODE.radius);
+
+            this.renderService.DrawMesh(this.quadMesh);
         }
-        this.renderService.DrawVertices(vertices);
+
+
+        this.renderService.SetProgram(this.playerProgram);
+
+        this.renderService.SetUniform("cameraPosition", camera.pos.ToArray());
+        this.renderService.SetUniform("worldToClip", worldToClip);
+
+        for (var n = 0; n < gameState.players.length; n++)
+        {
+            const PLAYER = gameState.players[n];
+            this.renderService.SetUniform("playerPosition", PLAYER.pos.ToArray());
+            this.renderService.SetUniform("playerRotation", PLAYER.rot);
+            this.renderService.SetUniform("playerSize", PLAYER.shipConfig.size);
+
+            this.renderService.DrawMesh(this.quadMesh);
+        }
+
+
+
     }
     ///-----------------------------------------------------------------------///
 }

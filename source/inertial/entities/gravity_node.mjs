@@ -22,6 +22,8 @@ export class GravityNode extends StaticEntity
         this.mass = mass;
         this.regenMult = regenMult;
         this.regenDoubleDist = regenDoubleDist;
+
+        this.radius = this.mass * 0.1; //Could be scaled by some factor
     }
     ///-----------------------------------------------------------------------///
 }

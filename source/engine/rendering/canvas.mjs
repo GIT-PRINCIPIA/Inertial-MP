@@ -14,7 +14,11 @@ export class Canvas
     constructor(html) 
     {
         this.html = html;
-        this.ctx = html.getContext("2d");
+        this.gl = html.getContext("webgl2");
+        if (!this.gl)
+        {
+            throw new Error("WebGL 2 is not available for this canvas.");
+        }
         this.dpr = window.devicePixelRatio || 1;
         this.Resize();
     }
@@ -25,20 +29,16 @@ export class Canvas
     //Resize()
     Resize() 
     {
-        const cssW = this.html.clientWidth || this.html.offsetWidth || 300;
-        const cssH = this.html.clientHeight || this.html.offsetHeight || 150;
+        const cssW = this.html.clientWidth;
+        const cssH = this.html.clientHeight;
 
-        const pixelW = Math.max(1, Math.floor(cssW * this.dpr));
-        const pixelH = Math.max(1, Math.floor(cssH * this.dpr));
-
-        if (this.html.width !== pixelW || this.html.height !== pixelH) {
-            this.html.width = pixelW;
-            this.html.height = pixelH;
+        if (this.html.width !== cssW || this.html.height !== cssH) 
+        {
+            this.html.width = cssW;
+            this.html.height = cssH;
         }
 
-        // make the ctx use CSS pixels as coordinates
-        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-        this.ctx.scale(this.dpr, this.dpr);
+        this.gl.viewport(0, 0, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight);
 
         // expose CSS dims for camera/world mapping
         this.width = cssW;
