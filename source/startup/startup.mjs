@@ -70,10 +70,8 @@ async function StartInertial()
         core.onFixedUpdate.Subscribe((dt)=>{playerCamera.FixedUpdate(dt);});
         let backend = new WebGLbackend(canvas);
         let renderService = new RenderService(canvas, backend);
-        console.dir(renderService);
         let renderer = new Renderer(canvas, renderService);
         await renderer.Initialize();
-        console.dir(renderer);
     
         core.onRender.Subscribe(()=>{renderer.DrawScene(camera, client.gameState);});
         window.addEventListener('resize', canvas.Resize.bind(canvas));

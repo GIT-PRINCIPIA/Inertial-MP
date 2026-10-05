@@ -44,7 +44,6 @@ export class MessageQueueReader
     //@return an array of all messages with that type
     Read(type)
     {
-        console.log("read " + type);
         let arr = [];
         for (const ITEM of this.queue.queue)
         {

@@ -57,7 +57,6 @@ export class MessageQueue
     //@return all items removed
     Drain(type)
     {
-        console.log("drain " + type);
         let arr = [];
         let drained = [];
         for (const ITEM of this.queue)
@@ -81,7 +80,6 @@ export class MessageQueue
     //TickLifetimes()
     TickLifetimes()
     {
-        console.log("Tick lifetimes");
         let arr = [];
         for (const ITEM of this.queue)
         {

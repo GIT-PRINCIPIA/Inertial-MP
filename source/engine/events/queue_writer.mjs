@@ -25,9 +25,7 @@ export class MessageQueueWriter
     //@param lifetime the message's lifetime in ticks
     Write(type, message, lifetime = 1)
     {
-        console.log("Write");
         let packet = {type: type, msg: message, lifetime: lifetime};
-        console.dir(packet);
         this.queue.queue.push(packet);
     }
     ///-----------------------------------------------------------------------///
