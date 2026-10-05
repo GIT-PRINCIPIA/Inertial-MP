@@ -18,6 +18,9 @@ export class InputFeeder
 
         this.keyStatuses = {};
 
+        this.mouseX = 0;
+        this.mouseY = 0;
+
         this.Register("keydown", (event) =>
         {
             this.keyStatuses[event.code] = true;
@@ -57,6 +60,12 @@ export class InputFeeder
                 clientY: event.clientY
             });
         }, { passive: true });
+
+        this.Register('mousemove', (event) => 
+        {
+            this.mouseX = event.clientX;
+            this.mouseY = event.clientY;
+        });
     }
     ///-----------------------------------------------------------------------///
 
@@ -84,6 +93,8 @@ export class InputFeeder
             }
 
         }
+
+        this.output.Write("INPUT", {type: "mousePos", x: this.mouseX, y: this.mouseY});
     }
     ///-----------------------------------------------------------------------///
 

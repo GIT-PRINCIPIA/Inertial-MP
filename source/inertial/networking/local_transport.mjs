@@ -3,7 +3,7 @@
 //A transport layer which connects a local client and local server
 ///-----------------------------------------------------------------------///
 
-import { ServerMessage } from "./server_message.mjs";
+import { ServerInputPacket } from "./server_input_packet.mjs";
 
 
 ///-----------------------------------------------------------------------///
@@ -30,19 +30,17 @@ export class LocalTransport
     //Tick()
     Tick()
     {
-        while (!this.clientOutput.Empty())
+        const CLIENT_OUTPUTS = this.clientOutput.Drain("CLIENT_TO_SERVER_PACKET");
+        for (const CLIENT_OUTPUT of CLIENT_OUTPUTS)
         {
-            const PACKET = this.clientOutput.Pop();
-            const SERVER_MSG = new ServerMessage(PACKET, 0);
-            this.serverInput.Write("PACKET", structuredClone(SERVER_MSG));
+            const SERVER_MSG = new ServerInputPacket(CLIENT_OUTPUT, 0);
+            this.serverInput.Write("CLIENT_TO_SERVER_PACKET", structuredClone(SERVER_MSG), 20);
         }
-        while (!this.serverOutput.Empty())
+
+        const SERVER_OUTPUTS = this.serverOutput.Drain("SERVER_TO_CLIENT_PACKET");
+        for (const SERVER_OUTPUT of SERVER_OUTPUTS)
         {
-            const ITEM = this.serverOutput.Pop();
-            const PACKET = ITEM.msg;
-            const CLIENT_MSG = PACKET.message;
-            const TYPE = ITEM.type;
-            this.clientInput.Write(structuredClone(TYPE), structuredClone(CLIENT_MSG));
+            this.clientInput.Write("SERVER_TO_CLIENT_PACKET", structuredClone({type: SERVER_OUTPUT.type, msg: SERVER_OUTPUT.message}), 20);
         }
     }
     ///-----------------------------------------------------------------------///

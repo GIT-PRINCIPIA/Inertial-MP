@@ -49,6 +49,52 @@ export class MessageQueue
         return this.writer;
     }
     ///-----------------------------------------------------------------------///
+
+
+    ///-----------------------------------------------------------------------///
+    //Drain(type)
+    //@param type the type of message to drain from the queue
+    //@return all items removed
+    Drain(type)
+    {
+        console.log("drain " + type);
+        let arr = [];
+        let drained = [];
+        for (const ITEM of this.queue)
+        {
+            if (ITEM.type != type) 
+            {
+                arr.push(ITEM); //No need for structured clone
+            }
+            else
+            {
+                drained.push(ITEM.msg); //No need for structured clone
+            }
+        }
+        this.queue = arr;
+        return drained;
+    }
+    ///-----------------------------------------------------------------------///
+
+
+    ///-----------------------------------------------------------------------///
+    //TickLifetimes()
+    TickLifetimes()
+    {
+        console.log("Tick lifetimes");
+        let arr = [];
+        for (const ITEM of this.queue)
+        {
+            ITEM.lifetime--;
+            if (ITEM.lifetime >= 0) 
+            {
+                //Keep the item
+                arr.push(ITEM); //No need for structured clone
+            }
+        }
+        this.queue = arr;
+    }
+    ///-----------------------------------------------------------------------///
 }
 //End of MessageQueue class
 ///-----------------------------------------------------------------------///

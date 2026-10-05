@@ -23,6 +23,8 @@ export class Core
         this.onDispatchOutputs = new EventBroadcast();
         this.onStop = new EventBroadcast();
 
+        this.onTickLifetimes = new EventBroadcast(); //E.g message queue packet lifetimes
+
         this.inputQueue = new MessageQueue(); //E.g keyboard input, incoming packets
         this.outputQueue = new MessageQueue(); //E.g sending packets to the server
     }

@@ -4,8 +4,7 @@
 ///-----------------------------------------------------------------------///
 
 import { EventBroadcast } from "../../engine/events/broadcast.mjs";
-import { ClientMessage } from "../player/client_message.mjs";
-import { PlayerCamera } from "../player/player_camera.mjs";
+import { ClientOutputPacket } from "../networking/client_output_packet.mjs";
 import { PlayerCommand } from "../player/player_command.mjs";
 import { GameState } from "./simulation/game_state.mjs";
 import { GameStatePatcher } from "./simulation/game_state_patcher.mjs";
@@ -39,42 +38,39 @@ export class Client
     FixedUpdate(dt)
     {
         let playerCommand = new PlayerCommand(0,0);
-        const MESSAGE_VIEWS = this.input.PeekAll();
-        for (const VIEW of MESSAGE_VIEWS)
+
+        const SERVER_TO_CLIENT_PACKETS = this.input.Drain("SERVER_TO_CLIENT_PACKET");
+        for (const SERVER_TO_CLIENT_PACKET of SERVER_TO_CLIENT_PACKETS)
         {
-            console.log(VIEW);
-            switch (VIEW.type)
+            switch (SERVER_TO_CLIENT_PACKET.type)
             {
                 case "PATCH":
                 {
-                    const MSG = this.input.CommitTo(VIEW.id);
-                    console.log(MSG);
-                    const PAYLOAD = MSG.msg;
-                    GameStatePatcher.Patch(this.gameState, PAYLOAD);
-                }
-                break;
-                case "INPUT":
-                {
-                    const MSG = this.input.CommitTo(VIEW.id);
-                    console.log(MSG);
-                    const PAYLOAD = MSG.msg;
-                    this.#HandleInputMSG(playerCommand, PAYLOAD);
+                    GameStatePatcher.Patch(this.gameState, SERVER_TO_CLIENT_PACKET.msg);
                 }
                 break;
                 case "PLAYER_ID":
                 {
-                    const MSG = this.input.CommitTo(VIEW.id);
-                    const PAYLOAD = MSG.msg;
-                    console.log(MSG);
-                    this.playerID = PAYLOAD;
-                    this.onPlayerIDreceived.Fire(PAYLOAD);
+                    const ID = SERVER_TO_CLIENT_PACKET.msg;
+                    this.playerID = ID;
+                    this.onPlayerIDreceived.Fire(ID);
                 }
                 break;
             }
         }
-        this.output.Write("PLAYER_COMMAND", playerCommand.Serialize());
 
-        if (this.playerID == null) this.output.Write("REQUEST_PLAYER_ID", "REQUEST_PLAYER_ID");
+
+        const INPUTS = this.input.Read("INPUT");
+        for (const INPUT of INPUTS)
+        {
+            this.#HandleInputMSG(playerCommand, INPUT);
+        }
+
+        
+        
+        this.output.Write("CLIENT_TO_SERVER_PACKET", new ClientOutputPacket("PLAYER_COMMAND", playerCommand.Serialize()));
+
+        if (this.playerID == null) this.output.Write("CLIENT_TO_SERVER_PACKET", new ClientOutputPacket("REQUEST_PLAYER_ID", null));
     }
     ///-----------------------------------------------------------------------///
 

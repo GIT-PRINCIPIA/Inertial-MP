@@ -19,12 +19,16 @@ export class MessageQueueWriter
 
 
     ///-----------------------------------------------------------------------///
-    //Write(type, message)
+    //Write(type, message, lifetime)
     //@param type the message type, used for parsing
     //@param message the message to add to the MessageQueue
-    Write(type, message)
+    //@param lifetime the message's lifetime in ticks
+    Write(type, message, lifetime = 1)
     {
-        this.queue.queue.push({type: type, msg: message, id: this.queue.queue.length});
+        console.log("Write");
+        let packet = {type: type, msg: message, lifetime: lifetime};
+        console.dir(packet);
+        this.queue.queue.push(packet);
     }
     ///-----------------------------------------------------------------------///
 }

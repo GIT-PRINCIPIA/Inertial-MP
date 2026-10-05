@@ -8,7 +8,7 @@ import { Vec2 } from "../../utility/vector.mjs";
 import { EntityRegistry } from "../entities/entity_registry.mjs";
 import { GravityNode } from "../entities/gravity_node.mjs";
 import { ClientConnectionHandler } from "../networking/client_connection_handler.mjs";
-import { ClientMessage } from "../player/client_message.mjs";
+import { ServerOutputPacket } from "../networking/server_output_packet.mjs";
 import { Player } from "../player/player.mjs";
 import { PlayerCommand } from "../player/player_command.mjs";
 import { ShipConfig } from "../player/ship_config.mjs";
@@ -56,13 +56,13 @@ export class Server
     //@param dt delta time
     FixedUpdate(dt)
     {
-        while (!this.input.Empty())
+        const CLIENT_TO_SERVER_PACKETS = this.input.Drain("CLIENT_TO_SERVER_PACKET");
+        for (const CLIENT_TO_SERVER_PACKET of CLIENT_TO_SERVER_PACKETS)
         {
-            const PACKET = this.input.Pop().msg;
-            const SOURCE = PACKET.source;
-            const MESSAGE = PACKET.message;
+            const SOURCE = CLIENT_TO_SERVER_PACKET.source;
+            const MESSAGE = CLIENT_TO_SERVER_PACKET.message;
             const TYPE = MESSAGE.type;
-            const DATA = MESSAGE.msg;
+            const DATA = MESSAGE.payload;
 
             switch (TYPE)
             {
@@ -74,7 +74,7 @@ export class Server
                     //Player entity added BEFORE patches are sent.
                     //Client gets PLAYER_ID packet same frame as the PATCH packet.
                     const PLAYER_ID = this.clientConnectionHandler.GetClientPlayerEntity(SOURCE);
-                    this.output.Write("PLAYER_ID", new ClientMessage(SOURCE, PLAYER_ID));
+                    this.output.Write("SERVER_TO_CLIENT_PACKET", new ServerOutputPacket(SOURCE, "PLAYER_ID", PLAYER_ID));
                 break;
             }
         }
@@ -86,7 +86,7 @@ export class Server
             let patch = GameStatePatcher.GeneratePatch(PLAYER);
             for (const RECIPIENT of this.simulation.gameState.players)
             {
-                this.output.Write("PATCH", new ClientMessage(RECIPIENT.id, patch));
+                this.output.Write("SERVER_TO_CLIENT_PACKET", new ServerOutputPacket(RECIPIENT.id, "PATCH", patch));
             }
             
         }
@@ -95,7 +95,7 @@ export class Server
             let patch = GameStatePatcher.GeneratePatch(NODE);
             for (const RECIPIENT of this.simulation.gameState.players)
             {
-                this.output.Write("PATCH", new ClientMessage(RECIPIENT.id, patch));
+                this.output.Write("SERVER_TO_CLIENT_PACKET", new ServerOutputPacket(RECIPIENT.id, "PATCH", patch));
             }
         }
         

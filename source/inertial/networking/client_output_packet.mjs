@@ -1,23 +1,23 @@
 ///-----------------------------------------------------------------------///
-//server_message.mjs
-//A wrapper around a basic message object, for use on the server side's input only
+//client_output_packet.mjs
+//A CLIENT SIDE packet, OWNED BY THE CLIENT
 ///-----------------------------------------------------------------------///
 
 
 ///-----------------------------------------------------------------------///
-//ServerMessage class
-export class ServerMessage
+//ClientOutputPacket class
+export class ClientOutputPacket
 {
     ///-----------------------------------------------------------------------///
-    //constructor(message, source)
-    //@param message the message
-    //@param source the identifying source of the message
-    constructor(message, source)
+    //constructor(type, payload)
+    //@param type the type of payload the packet carries
+    //@param payload the packet's payload
+    constructor(type, payload)
     {
-        this.message = message;
-        this.source = source;
+        this.type = type;
+        this.payload = payload;
     }
     ///-----------------------------------------------------------------------///
 }
-//End of ServerMessage class
+//End of ClientOutputPacket class
 ///-----------------------------------------------------------------------///

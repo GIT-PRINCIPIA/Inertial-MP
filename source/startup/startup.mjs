@@ -28,6 +28,8 @@ async function StartInertial()
 
     let core = new Core(null); //Replace null with config
 
+    core.onTickLifetimes.Subscribe(core.inputQueue.TickLifetimes.bind(core.inputQueue));
+
     let client = new Client(core.inputQueue.Reader(), core.outputQueue.Writer());
 
     core.onFixedUpdate.Subscribe(client.FixedUpdate.bind(client));
@@ -48,6 +50,8 @@ async function StartInertial()
 
     core.onFixedUpdate.Subscribe(server.FixedUpdate.bind(server));
 
+    core.onTickLifetimes.Subscribe(serverInput.TickLifetimes.bind(serverInput));
+
 
 
     client.onPlayerIDreceived.Subscribe(async (PLAYER_ID)=>{
@@ -57,7 +61,7 @@ async function StartInertial()
         //Camera
         let camera = new Camera(new Vec2(10, 10), new Vec2(0,0), 1);
     
-        let playerCamera = new PlayerCamera(camera, player);
+        let playerCamera = new PlayerCamera(camera, player, client.input);
     
         
         

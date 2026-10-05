@@ -1,23 +1,23 @@
 ///-----------------------------------------------------------------------///
-//client_message.mjs
-//A wrapper around a basic message object, for use on the server side's output only
+//server_input_packet.mjs
+//A wrapper around a basic message object, for use on the server side's input only
 ///-----------------------------------------------------------------------///
 
 
 ///-----------------------------------------------------------------------///
-//ClientMessage class
-export class ClientMessage
+//ServerInputPacket class
+export class ServerInputPacket
 {
     ///-----------------------------------------------------------------------///
-    //constructor(target, message)
-    //@param target the target recipient
-    //@param message the message data
-    constructor(target, message)
+    //constructor(message, source)
+    //@param message the message
+    //@param source the identifying source of the message
+    constructor(message, source)
     {
-        this.target = target;
         this.message = message;
+        this.source = source;
     }
     ///-----------------------------------------------------------------------///
 }
-//End of ClientMessage class
+//End of ServerInputPacket class
 ///-----------------------------------------------------------------------///

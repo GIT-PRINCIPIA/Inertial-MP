@@ -27,6 +27,7 @@ export class PlayerSimulation
         player.rot += player.angVel * dt;
 
         PlayerSimulation.ApplyPlayerInput(player, command, dt);
+        
         {
             let error = player.targetAngVel - player.angVel;
 
