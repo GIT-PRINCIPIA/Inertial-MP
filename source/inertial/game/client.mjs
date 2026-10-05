@@ -22,6 +22,8 @@ export class Client
         this.output = output;
 
         //Would request a player to be constructed - but the client NEED NOT know about the player
+        this.playerID = null;
+        this.output.Write("REQUEST_PLAYER_ID", "REQUEST_PLAYER_ID");
     }
     ///-----------------------------------------------------------------------///
 
@@ -44,6 +46,10 @@ export class Client
                 break;
                 case "INPUT":
                     this.#HandleInputMSG(PAYLOAD);
+                break;
+                case "PLAYER_ID":
+                    this.playerID = PAYLOAD;
+                    console.log(PAYLOAD);
                 break;
             }
         }

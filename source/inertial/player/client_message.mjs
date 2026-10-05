@@ -9,14 +9,12 @@
 export class ClientMessage
 {
     ///-----------------------------------------------------------------------///
-    //constructor(target, type, message)
+    //constructor(target, message)
     //@param target the target recipient
-    //@param type the type of packet
     //@param message the message data
-    constructor(target, type, message)
+    constructor(target, message)
     {
         this.target = target;
-        this.type = type;
         this.message = message;
     }
     ///-----------------------------------------------------------------------///

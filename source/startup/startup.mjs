@@ -17,6 +17,7 @@ import { Vec2 } from "../utility/vector.mjs";
 import { InputFeeder } from "../engine/interface/input.mjs";
 import { MessageQueue } from "../engine/events/queue.mjs";
 import { LocalTransport } from "../inertial/networking/local_transport.mjs";
+import { PlayerCamera } from "../inertial/player/player_camera.mjs";
 
 ///-----------------------------------------------------------------------///
 //StartInertial()
@@ -50,11 +51,15 @@ async function StartInertial()
 
 
     //Camera
-    let camera = new Camera(new Vec2(10, 10), server.simulation.gameState.players[0].pos, 1);
+    let camera = new Camera(new Vec2(10, 10), new Vec2(0,0), 1);
 
+    let playerCamera = new PlayerCamera(camera, client);
 
+    
+    
     //Renderer
     let canvas = new Canvas(document.getElementById("game-window"));
+    core.onFixedUpdate.Subscribe((dt)=>{playerCamera.FixedUpdate(dt);});
     let backend = new WebGLbackend(canvas);
     let renderService = new RenderService(canvas, backend);
     console.dir(renderService);

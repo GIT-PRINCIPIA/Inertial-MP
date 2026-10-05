@@ -36,7 +36,7 @@ export function Clamp01(value)
 //@return the interpolated value
 export function Lerp(a, b, t)
 {
-    return a + (b - a) * Clamp01(t);
+    return a + (b - a) * (t);
 }
 ///-----------------------------------------------------------------------///
 

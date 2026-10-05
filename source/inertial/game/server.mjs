@@ -5,7 +5,9 @@
 
 import { Lerp, Clamp01 } from "../../utility/scalar.mjs";
 import { Vec2 } from "../../utility/vector.mjs";
+import { EntityRegistry } from "../entities/entity_registry.mjs";
 import { GravityNode } from "../entities/gravity_node.mjs";
+import { ClientConnectionHandler } from "../networking/client_connection_handler.mjs";
 import { ClientMessage } from "../player/client_message.mjs";
 import { Player } from "../player/player.mjs";
 import { ShipConfig } from "../player/ship_config.mjs";
@@ -16,8 +18,6 @@ import { Simulation } from "./simulation/simulation.mjs";
 //Server class
 export class Server
 {
-    simulation;
-
     ///-----------------------------------------------------------------------///
     //constructor(input, output)
     //@param input the queue reader the server will use for receiving messages
@@ -28,11 +28,22 @@ export class Server
         this.output = output;
         this.simulation = new Simulation();
 
-        this.simulation.gameState.AddEntity(new Player(0, {pos: new Vec2(0, 0), vel: new Vec2(1.75, 0), rot: 0, angVel: 0, shipConfig: new ShipConfig(1, 0.1)}));
-        this.simulation.gameState.AddEntity(new GravityNode(1, {pos: new Vec2(0, 4), mass: 1, regenMult: 1, regenDoubleDist: 10}));
-        this.simulation.gameState.AddEntity(new GravityNode(2, {pos: new Vec2(2, 6), mass: 1, regenMult: 1, regenDoubleDist: 10}));
-        this.simulation.gameState.AddEntity(new GravityNode(3, {pos: new Vec2(-4, 3), mass: 1, regenMult: 1, regenDoubleDist: 10}));
-        this.simulation.gameState.AddEntity(new GravityNode(4, {pos: new Vec2(-2, -3), mass: 1, regenMult: 1, regenDoubleDist: 10}));
+        this.entityRegistry = new EntityRegistry(this.simulation.gameState);
+
+        this.clientConnectionHandler = new ClientConnectionHandler(this.entityRegistry);
+
+
+        let node = new GravityNode(1, {pos: new Vec2(0, 4), mass: 1, regenMult: 1, regenDoubleDist: 10});
+        this.entityRegistry.RegisterEntity(node);
+
+        let node1 = new GravityNode(2, {pos: new Vec2(2, 6), mass: 1, regenMult: 1, regenDoubleDist: 10});
+        this.entityRegistry.RegisterEntity(node1);
+
+        let node2 = new GravityNode(3, {pos: new Vec2(-4, 3), mass: 1, regenMult: 1, regenDoubleDist: 10});
+        this.entityRegistry.RegisterEntity(node2);
+
+        let node3 = new GravityNode(4, {pos: new Vec2(-2, -3), mass: 1, regenMult: 1, regenDoubleDist: 10});
+        this.entityRegistry.RegisterEntity(node3);
     }
     ///-----------------------------------------------------------------------///
 
@@ -50,7 +61,7 @@ export class Server
             let patch = GameStatePatcher.GeneratePatch(PLAYER);
             for (const RECIPIENT of this.simulation.gameState.players)
             {
-                this.output.Write("PACKET", new ClientMessage(RECIPIENT.id, "PATCH", patch));
+                this.output.Write("PATCH", new ClientMessage(RECIPIENT.id, patch));
             }
             
         }
@@ -59,7 +70,7 @@ export class Server
             let patch = GameStatePatcher.GeneratePatch(NODE);
             for (const RECIPIENT of this.simulation.gameState.players)
             {
-                this.output.Write("PACKET", new ClientMessage(RECIPIENT.id, "PATCH", patch));
+                this.output.Write("PATCH", new ClientMessage(RECIPIENT.id, patch));
             }
         }
 
@@ -74,7 +85,7 @@ export class Server
             switch (TYPE)
             {
                 case "INPUT":
-                    const ID = SOURCE;
+                    const ID = this.clientConnectionHandler.GetClientPlayerEntity(SOURCE);
                     const PLAYER = this.simulation.gameState.players.find((candidate)=>{return candidate.id == ID;});
 
                     switch (DATA)
@@ -92,6 +103,10 @@ export class Server
                             PLAYER.angVel = Lerp(PLAYER.angVel, 4, Clamp01(dt * 10));
                         break;
                     }
+                break;
+                case "REQUEST_PLAYER_ID":
+                    const PLAYER_ID = this.clientConnectionHandler.GetClientPlayerEntity(SOURCE);
+                    this.output.Write("PLAYER_ID", new ClientMessage(SOURCE, PLAYER_ID));
                 break;
             }
         }

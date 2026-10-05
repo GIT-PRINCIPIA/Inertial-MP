@@ -11,7 +11,6 @@ import { PlayerSimulation } from "./player_simulation.mjs";
 //Simulation class
 export class Simulation
 {
-    gameState;
     ///-----------------------------------------------------------------------///
     //constructor()
     constructor()
