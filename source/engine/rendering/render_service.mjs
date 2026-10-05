@@ -123,16 +123,6 @@ export class RenderService
         this.#backend.ClearScreen(clearColour.ToArray());
     }
     ///-----------------------------------------------------------------------///
-
-
-    ///-----------------------------------------------------------------------///
-    //DrawVertices(camera, vertices)
-    //@param vertices the vertices that make up the mesh to draw
-    DrawVertices(vertices)
-    {
-        this.#backend.DrawVertices(vertices);
-    }
-    ///-----------------------------------------------------------------------///
 }
 //End of RenderService class
 ///-----------------------------------------------------------------------///

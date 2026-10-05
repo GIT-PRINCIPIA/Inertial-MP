@@ -54,10 +54,33 @@ export class MessageQueueReader
 
     ///-----------------------------------------------------------------------///
     //PeekAll()
-    //@return the message queue's contents, without removing them from the queue
+    //@return the types of all messages in the queue
     PeekAll()
     {
-        return this.queue.queue;
+        let view = [];
+        for (const ITEM of this.queue.queue)
+        {
+            view.push({type: ITEM.type, id: ITEM.id});
+        }
+        return view;
+    }
+    ///-----------------------------------------------------------------------///
+
+
+    ///-----------------------------------------------------------------------///
+    //CommitTo(id)
+    //@param id the id of the message to commmit to receiving
+    CommitTo(id)
+    {
+        for (var i = 0; i < this.queue.queue.length; i++)
+        {
+            const ITEM = this.queue.queue[i];
+            if (ITEM.id == id)
+            {
+                this.queue.queue.splice(i, 1);
+                return ITEM;
+            }
+        }
     }
     ///-----------------------------------------------------------------------///
 

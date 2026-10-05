@@ -8,14 +8,38 @@
 //ShipConfig class
 export class ShipConfig
 {
+    mass;
+    size;
+    
+
+    forwardThrustForce; //units/s^2
+    backwardThrustForce; //units/s^2
+
+    thrustEnergyEfficiency; //energy/s
+
+    turnSpeed; //rads/s
+
+    turnAccel; //rads/s/s
+
+    rcsThrustForce; //units/s^2 requires no energy, but very little thrust
+
+
+
     ///-----------------------------------------------------------------------///
-    //constructor(mass, size)
-    //@param mass the mass of the ship
-    //@param size the size of the ship
-    constructor(mass, size)
+    //Default()
+    //@return the default ship config
+    static Default()
     {
-        this.mass = mass;
-        this.size = size;
+        let c = new ShipConfig();
+        c.mass = 1;
+        c.size = 0.1;
+        c.forwardThrustForce = 0.1;
+        c.backwardThrustForce = 0.1;
+        c.thrustEnergyEfficiency = 1;
+        c.turnSpeed = 4;
+        c.turnAccel = 32;
+        c.rcsThrustForce = 0.5;
+        return c;
     }
     ///-----------------------------------------------------------------------///
 }

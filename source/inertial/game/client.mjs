@@ -3,8 +3,11 @@
 //Stores client side game state, which is patched by the server
 ///-----------------------------------------------------------------------///
 
+import { EventBroadcast } from "../../engine/events/broadcast.mjs";
 import { ClientMessage } from "../player/client_message.mjs";
-import { GameState } from "./Simulation/game_state.mjs";
+import { PlayerCamera } from "../player/player_camera.mjs";
+import { PlayerCommand } from "../player/player_command.mjs";
+import { GameState } from "./simulation/game_state.mjs";
 import { GameStatePatcher } from "./simulation/game_state_patcher.mjs";
 
 ///-----------------------------------------------------------------------///
@@ -24,6 +27,8 @@ export class Client
         //Would request a player to be constructed - but the client NEED NOT know about the player
         this.playerID = null;
         this.output.Write("REQUEST_PLAYER_ID", "REQUEST_PLAYER_ID");
+
+        this.onPlayerIDreceived = new EventBroadcast();
     }
     ///-----------------------------------------------------------------------///
 
@@ -33,34 +38,52 @@ export class Client
     //@param dt delta time / timestep
     FixedUpdate(dt)
     {
-        while (!this.input.Empty())
+        let playerCommand = new PlayerCommand(0,0);
+        const MESSAGE_VIEWS = this.input.PeekAll();
+        for (const VIEW of MESSAGE_VIEWS)
         {
-            const MSG = this.input.Pop();
-            const TYPE = MSG.type;
-            const PAYLOAD = MSG.msg;
-
-            switch (TYPE)
+            console.log(VIEW);
+            switch (VIEW.type)
             {
                 case "PATCH":
+                {
+                    const MSG = this.input.CommitTo(VIEW.id);
+                    console.log(MSG);
+                    const PAYLOAD = MSG.msg;
                     GameStatePatcher.Patch(this.gameState, PAYLOAD);
+                }
                 break;
                 case "INPUT":
-                    this.#HandleInputMSG(PAYLOAD);
+                {
+                    const MSG = this.input.CommitTo(VIEW.id);
+                    console.log(MSG);
+                    const PAYLOAD = MSG.msg;
+                    this.#HandleInputMSG(playerCommand, PAYLOAD);
+                }
                 break;
                 case "PLAYER_ID":
+                {
+                    const MSG = this.input.CommitTo(VIEW.id);
+                    const PAYLOAD = MSG.msg;
+                    console.log(MSG);
                     this.playerID = PAYLOAD;
-                    console.log(PAYLOAD);
+                    this.onPlayerIDreceived.Fire(PAYLOAD);
+                }
                 break;
             }
         }
+        this.output.Write("PLAYER_COMMAND", playerCommand.Serialize());
+
+        if (this.playerID == null) this.output.Write("REQUEST_PLAYER_ID", "REQUEST_PLAYER_ID");
     }
     ///-----------------------------------------------------------------------///
 
 
     ///-----------------------------------------------------------------------///
-    //#HandleInputMSG(payload)
+    //#HandleInputMSG(command, payload)
+    //@param command the command which will absorb any new commands
     //@param payload the input message's payload
-    #HandleInputMSG(payload)
+    #HandleInputMSG(command, payload)
     {
         const INPUT_TYPE = payload.type;
 
@@ -68,7 +91,7 @@ export class Client
         {
             case "key":
                 const CODE = payload.code;
-                this.#HandleKeyPress(CODE);
+                this.#HandleKeyPress(command, CODE);
             break;
         }
     }
@@ -76,27 +99,28 @@ export class Client
 
 
     ///-----------------------------------------------------------------------///
-    //#HandleKeyPress(code)
+    //#HandleKeyPress(command, code)
+    //@param command the command which will absorb any new commands
     //@param code the key code for the input, e.g 'KeyW'
-    #HandleKeyPress(code)
+    #HandleKeyPress(command, code)
     {
         switch (code)
         {
             case "KeyW":
                 //Forward
-                this.output.Write("INPUT", "W");
+                command.Thrust(1);
             break;
             case "KeyS":
                 //Backward
-                this.output.Write("INPUT", "S");
+                command.Thrust(-1);
             break;
             case "KeyA":
                 //Left
-                this.output.Write("INPUT", "A");
+                command.Turn(-1);
             break;
             case "KeyD":
                 //Right
-                this.output.Write("INPUT", "D");
+                command.Turn(1);
             break;  
         }
     }

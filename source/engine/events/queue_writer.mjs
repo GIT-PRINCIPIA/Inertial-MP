@@ -24,7 +24,7 @@ export class MessageQueueWriter
     //@param message the message to add to the MessageQueue
     Write(type, message)
     {
-        this.queue.queue.push({type: type, msg: message});
+        this.queue.queue.push({type: type, msg: message, id: this.queue.queue.length});
     }
     ///-----------------------------------------------------------------------///
 }

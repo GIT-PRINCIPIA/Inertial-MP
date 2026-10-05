@@ -84,6 +84,7 @@ function Frame(core, time)
     core.onRender.Fire(deltaTime);
     core.onDispatchOutputs.Fire();
 
+
     animationFrameID = requestAnimationFrame((nextTime) =>
     {
         Frame(core, nextTime);

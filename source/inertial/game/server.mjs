@@ -10,8 +10,10 @@ import { GravityNode } from "../entities/gravity_node.mjs";
 import { ClientConnectionHandler } from "../networking/client_connection_handler.mjs";
 import { ClientMessage } from "../player/client_message.mjs";
 import { Player } from "../player/player.mjs";
+import { PlayerCommand } from "../player/player_command.mjs";
 import { ShipConfig } from "../player/ship_config.mjs";
 import { GameStatePatcher } from "./simulation/game_state_patcher.mjs";
+import { PlayerSimulation } from "./simulation/player_simulation.mjs";
 import { Simulation } from "./simulation/simulation.mjs";
 
 ///-----------------------------------------------------------------------///
@@ -48,13 +50,36 @@ export class Server
     ///-----------------------------------------------------------------------///
 
 
+
     ///-----------------------------------------------------------------------///
     //FixedUpdate(dt)
     //@param dt delta time
     FixedUpdate(dt)
     {
-        this.simulation.FixedUpdate(dt);
+        while (!this.input.Empty())
+        {
+            const PACKET = this.input.Pop().msg;
+            const SOURCE = PACKET.source;
+            const MESSAGE = PACKET.message;
+            const TYPE = MESSAGE.type;
+            const DATA = MESSAGE.msg;
 
+            switch (TYPE)
+            {
+                case "PLAYER_COMMAND":
+                    const ID = this.clientConnectionHandler.GetClientPlayerEntity(SOURCE);
+                    this.simulation.SetPlayerCommand(ID, PlayerCommand.Deserialize(DATA));
+                break;
+                case "REQUEST_PLAYER_ID":
+                    //Player entity added BEFORE patches are sent.
+                    //Client gets PLAYER_ID packet same frame as the PATCH packet.
+                    const PLAYER_ID = this.clientConnectionHandler.GetClientPlayerEntity(SOURCE);
+                    this.output.Write("PLAYER_ID", new ClientMessage(SOURCE, PLAYER_ID));
+                break;
+            }
+        }
+
+        this.simulation.FixedUpdate(dt);
 
         for (const PLAYER of this.simulation.gameState.players)
         {
@@ -73,43 +98,9 @@ export class Server
                 this.output.Write("PATCH", new ClientMessage(RECIPIENT.id, patch));
             }
         }
+        
 
-        while (!this.input.Empty())
-        {
-            const PACKET = this.input.Pop().msg;
-            const SOURCE = PACKET.source;
-            const MESSAGE = PACKET.message;
-            const TYPE = MESSAGE.type;
-            const DATA = MESSAGE.msg;
 
-            switch (TYPE)
-            {
-                case "INPUT":
-                    const ID = this.clientConnectionHandler.GetClientPlayerEntity(SOURCE);
-                    const PLAYER = this.simulation.gameState.players.find((candidate)=>{return candidate.id == ID;});
-
-                    switch (DATA)
-                    {
-                        case "W":
-                            PLAYER.vel.AddInPlace(Vec2.FromAngle(PLAYER.rot).MultiplyScalarInPlace(0.05));
-                        break;
-                        case "S":
-                            PLAYER.vel.SubtractInPlace(Vec2.FromAngle(PLAYER.rot).MultiplyScalarInPlace(0.05));
-                        break;
-                        case "A":
-                            PLAYER.angVel = Lerp(PLAYER.angVel, -4, Clamp01(dt * 10));
-                        break;
-                        case "D":
-                            PLAYER.angVel = Lerp(PLAYER.angVel, 4, Clamp01(dt * 10));
-                        break;
-                    }
-                break;
-                case "REQUEST_PLAYER_ID":
-                    const PLAYER_ID = this.clientConnectionHandler.GetClientPlayerEntity(SOURCE);
-                    this.output.Write("PLAYER_ID", new ClientMessage(SOURCE, PLAYER_ID));
-                break;
-            }
-        }
         
     }
     ///-----------------------------------------------------------------------///

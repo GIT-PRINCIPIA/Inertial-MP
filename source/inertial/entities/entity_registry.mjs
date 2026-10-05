@@ -60,7 +60,7 @@ export class EntityRegistry
     //@param id the id to unregister
     UnregisterID(id)
     {
-        if (this.entityIDs.length > id)
+        if (this.entityIDs.length > id && this.freeIDs.indexOf(id) == -1)
         {
             this.freeIDs.push(id);
             this.gameState.RemoveEntity(id);

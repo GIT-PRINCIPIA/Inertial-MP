@@ -55,18 +55,13 @@ export class GameStatePatcher
                 );
                 return;
             }
-            entity = new CLASS(patch.id, patch.args); 
+            entity = CLASS.NewFromSerialized(patch.args); 
             gameState.AddEntity(entity);
         }
         else
         {
             //Update existing entity
-            const KEYS = Object.keys(patch.args);
-            for (const KEY of KEYS)
-            {
-                const VALUE = patch.args[KEY];
-                entity[KEY] = VALUE;
-            }
+            entity.UpdateFromSerialized(patch.args);
         }
     }
     ///-----------------------------------------------------------------------///
@@ -78,32 +73,7 @@ export class GameStatePatcher
     //@return the patch for the entity, or null if failed
     static GeneratePatch(entity)
     {
-        var keys = Object.keys(entity);
-        const ID_IDX = keys.indexOf('id');
-        if (ID_IDX == -1) 
-        {
-            Logger.Error(
-                "could not generate patch for Entity 'entity' - 'entity' was not an Entity - it did not have an ID.",
-                "GeneratePatch(entity)",
-                "GameStatePatcher",
-                "game_state_patcher.mjs"
-            );
-            return null;
-        }
-        const ID = entity.id;
-        
-
-        let args = {};
-        for (const KEY of keys)
-        {
-            if (KEY == 'id') continue;
-            if (KEY == 'type') continue;
-
-            const VALUE = entity[KEY];
-            args[KEY] = VALUE;
-        }
-
-        let patch = new GameStatePatch(ID, entity.type, args); 
+        let patch = new GameStatePatch(entity.id, entity.type, entity.Serialize()); 
         return patch;
     }
     ///-----------------------------------------------------------------------///

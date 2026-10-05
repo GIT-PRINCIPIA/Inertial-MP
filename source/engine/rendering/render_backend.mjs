@@ -8,7 +8,6 @@
 //WebGLbackend class
 export class WebGLbackend
 {
-    #defaultProgram;
     #currentProgram = null;
 
     ///-----------------------------------------------------------------------///

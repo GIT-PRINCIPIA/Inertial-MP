@@ -16,6 +16,18 @@ export class Simulation
     constructor()
     {
         this.gameState = new GameState();
+        this.playerCommands = new Map();
+    }
+    ///-----------------------------------------------------------------------///
+
+
+    ///-----------------------------------------------------------------------///
+    //SetPlayerCommand(ID, command)
+    //@param ID the id of the player
+    //@param command the command
+    SetPlayerCommand(ID, command)
+    {
+        this.playerCommands.set(ID, command);
     }
     ///-----------------------------------------------------------------------///
 
@@ -27,30 +39,12 @@ export class Simulation
     {
         for (const PLAYER of this.gameState.players)
         {
-            PlayerSimulation.UpdatePlayer(PLAYER, dt, this.gameState);
+            PlayerSimulation.UpdatePlayer(PLAYER, this.playerCommands.get(PLAYER.id), dt, this.gameState);
         }
     }
     ///-----------------------------------------------------------------------///
 
 
-    ///-----------------------------------------------------------------------///
-    //AddPlayer(player)
-    //@param player the player to add
-    AddPlayer(player)
-    {
-        this.gameState.players.push(player);
-    }
-    ///-----------------------------------------------------------------------///
-
-
-    ///-----------------------------------------------------------------------///
-    //AddNode(node)
-    //@param node the GravityNode to add
-    AddNode(node)
-    {
-        this.gameState.nodes.push(node);
-    }
-    ///-----------------------------------------------------------------------///
 
 
     ///-----------------------------------------------------------------------///

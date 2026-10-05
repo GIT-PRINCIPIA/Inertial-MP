@@ -50,25 +50,30 @@ async function StartInertial()
 
 
 
-    //Camera
-    let camera = new Camera(new Vec2(10, 10), new Vec2(0,0), 1);
+    client.onPlayerIDreceived.Subscribe(async (PLAYER_ID)=>{
 
-    let playerCamera = new PlayerCamera(camera, client);
-
+        let player = client.gameState.GetEntity(PLAYER_ID);
+        if (!player) return;
+        //Camera
+        let camera = new Camera(new Vec2(10, 10), new Vec2(0,0), 1);
     
+        let playerCamera = new PlayerCamera(camera, player);
     
-    //Renderer
-    let canvas = new Canvas(document.getElementById("game-window"));
-    core.onFixedUpdate.Subscribe((dt)=>{playerCamera.FixedUpdate(dt);});
-    let backend = new WebGLbackend(canvas);
-    let renderService = new RenderService(canvas, backend);
-    console.dir(renderService);
-    let renderer = new Renderer(canvas, renderService);
-    await renderer.Initialize();
-    console.dir(renderer);
-
-    core.onRender.Subscribe(()=>{renderer.DrawScene(camera, client.gameState);});
-    window.addEventListener('resize', canvas.Resize.bind(canvas));
+        
+        
+        //Renderer
+        let canvas = new Canvas(document.getElementById("game-window"));
+        core.onFixedUpdate.Subscribe((dt)=>{playerCamera.FixedUpdate(dt);});
+        let backend = new WebGLbackend(canvas);
+        let renderService = new RenderService(canvas, backend);
+        console.dir(renderService);
+        let renderer = new Renderer(canvas, renderService);
+        await renderer.Initialize();
+        console.dir(renderer);
+    
+        core.onRender.Subscribe(()=>{renderer.DrawScene(camera, client.gameState);});
+        window.addEventListener('resize', canvas.Resize.bind(canvas));
+    });
     StartGameLoop(core);
 }
 ///-----------------------------------------------------------------------///

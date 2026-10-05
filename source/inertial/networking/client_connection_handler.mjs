@@ -33,9 +33,10 @@ export class ClientConnectionHandler
         {
             //New client
             //For now, all players start at the same spot. A player spawner would take over, later
-            let player = new Player(0, {pos: Vec2.ZERO.Copy(), vel: Vec2.ZERO.Copy(), rot: 0, angVel: 0, shipConfig: new ShipConfig(1, 0.1)});
+            let player = new Player(0, {pos: Vec2.ZERO.Copy(), vel: Vec2.ZERO.Copy(), rot: 0, angVel: 0, shipConfig: ShipConfig.Default()});
             this.entityRegistry.RegisterEntity(player);
             this.connectionIDtoEntityID[connectionID] = player.id;
+            console.log("Player joined with connection ID " + connectionID);
             return player.id;
         }
         else
