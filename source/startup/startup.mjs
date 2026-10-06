@@ -18,6 +18,7 @@ import { InputFeeder } from "../engine/interface/input.mjs";
 import { MessageQueue } from "../engine/events/queue.mjs";
 import { LocalTransport } from "../inertial/networking/local_transport.mjs";
 import { PlayerCamera } from "../inertial/player/player_camera.mjs";
+import { Simulation } from "../inertial/game/simulation/simulation.mjs";
 
 ///-----------------------------------------------------------------------///
 //StartInertial()
@@ -38,8 +39,17 @@ async function StartInertial()
 
     core.onFixedUpdate.Subscribe(inputFeeder.Tick.bind(inputFeeder));
 
+    //Just for fun, let's add client prediction
+    {
+        //Theoretically, you could also take the generated client output messages for 
+        //player commands and route them into this simulation
+        let clientSimulation = new Simulation(client.gameState); //Write to client's gamestate
+
+        core.onFixedUpdate.Subscribe(clientSimulation.FixedUpdate.bind(clientSimulation));
+    }
+
     //Couple server to core
-    //For now, we are using a local server, so it accesses Core's input and output queues directly
+    //For now, we are using a local server
     let serverInput = new MessageQueue();
     let serverOutput = new MessageQueue();
     let server = new Server(serverInput.Reader(), serverOutput.Writer()); 

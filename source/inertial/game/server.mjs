@@ -12,6 +12,7 @@ import { ServerOutputPacket } from "../networking/server_output_packet.mjs";
 import { Player } from "../player/player.mjs";
 import { PlayerCommand } from "../player/player_command.mjs";
 import { ShipConfig } from "../player/ship_config.mjs";
+import { GameState } from "./simulation/game_state.mjs";
 import { GameStatePatcher } from "./simulation/game_state_patcher.mjs";
 import { PlayerSimulation } from "./simulation/player_simulation.mjs";
 import { Simulation } from "./simulation/simulation.mjs";
@@ -28,7 +29,7 @@ export class Server
     {
         this.input = input;
         this.output = output;
-        this.simulation = new Simulation();
+        this.simulation = new Simulation(new GameState());
 
         this.entityRegistry = new EntityRegistry(this.simulation.gameState);
 

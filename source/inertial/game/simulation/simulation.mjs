@@ -12,10 +12,11 @@ import { PlayerSimulation } from "./player_simulation.mjs";
 export class Simulation
 {
     ///-----------------------------------------------------------------------///
-    //constructor()
-    constructor()
+    //constructor(gameState)
+    //@param gameState the gameState to simulate
+    constructor(gameState)
     {
-        this.gameState = new GameState();
+        this.gameState = gameState;
         this.playerCommands = new Map();
     }
     ///-----------------------------------------------------------------------///
