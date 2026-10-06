@@ -3,6 +3,9 @@
 //Stores game state, such as players and nodes
 ///-----------------------------------------------------------------------///
 
+import { Vec2 } from "../../../utility/vector.mjs";
+import { BoundsCollider } from "../../physics/bounds_collider.mjs";
+
 
 ///-----------------------------------------------------------------------///
 //GameState class
@@ -14,6 +17,8 @@ export class GameState
     {
         this.players = [];
         this.nodes = [];
+
+        this.bounds = new BoundsCollider([new Vec2(-10, -10), new Vec2(-10, 10), new Vec2(10, 10), new Vec2(10, -10)]);
     }
     ///-----------------------------------------------------------------------///
 

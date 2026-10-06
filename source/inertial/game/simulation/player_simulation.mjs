@@ -5,6 +5,8 @@
 
 import { Clamp01, Lerp, SmoothStep } from "../../../utility/scalar.mjs";
 import { Vec2 } from "../../../utility/vector.mjs";
+import { CircleCollider } from "../../physics/circle_collider.mjs";
+import { Collision } from "../../physics/collision.mjs";
 import { GetAcceleration } from "../../physics/fundamentals.mjs";
 import { PlayerCommand } from "../../player/player_command.mjs";
 import { GravitySimulation } from "./gravity_simulation.mjs";
@@ -23,8 +25,7 @@ export class PlayerSimulation
     static UpdatePlayer(player, command, dt, gameState)
     {
         
-        player.pos.AddInPlace(player.vel.MultiplyScalar(dt));
-        player.rot += player.angVel * dt;
+        
 
         PlayerSimulation.ApplyPlayerInput(player, command, dt);
         
@@ -36,19 +37,30 @@ export class PlayerSimulation
             player.angVel += impulse;
         }
 
-        for (const NODE of gameState.nodes)
-        {
-            const DELTA = NODE.pos.Subtract(player.pos);
-            const SQR_DIST = DELTA.SqrLength();
-            const DELTA_NORM = DELTA.Normalize();
-            const ACCELERATIION = GravitySimulation.CalculateAcceleration(SQR_DIST, NODE.mass) * dt;
-
-
-            const ACCELERATIION_VEC = DELTA_NORM.MultiplyScalar(ACCELERATIION);
-
-            player.vel.AddInPlace(ACCELERATIION_VEC);
-        }
+        player.vel.AddInPlace(GravitySimulation.CalculateNodesAcceleration(player.pos, gameState.nodes).MultiplyScalarInPlace(dt));
         
+        player.pos.AddInPlace(player.vel.MultiplyScalar(dt));
+        player.rot += player.angVel * dt;
+
+        let collider = new CircleCollider(player.shipConfig.size);
+
+        let collision = Collision.CheckCollision(collider, gameState.bounds, player.pos, new Vec2(0,0), player.rot, 0);
+
+        if (collision)
+        {
+            player.pos.AddInPlace(
+                collision.normal.MultiplyScalar(collision.depth)
+            );
+
+            const NORMAL_VELOCITY = Vec2.Dot(
+                player.vel,
+                collision.normal
+            );
+
+            player.vel.SubtractInPlace(
+                collision.normal.MultiplyScalar(NORMAL_VELOCITY)
+            );
+        }
     }
     ///-----------------------------------------------------------------------///
 
@@ -64,8 +76,8 @@ export class PlayerSimulation
         input.Clamp(); //Avoid cheating with 'normalized' inputs higher than one
 
         let dirVec = Vec2.FromAngle(player.rot);
-        let accel = GetAcceleration(player.shipConfig.mass, player.shipConfig.forwardThrustForce, dt);
-        dirVec.MultiplyScalarInPlace(accel * input.thrust);
+        let accel = GetAcceleration(player.shipConfig.mass, player.shipConfig.forwardThrustForce);
+        dirVec.MultiplyScalarInPlace(accel * input.thrust * dt);
         player.vel.AddInPlace(dirVec);
 
         player.targetAngVel = player.shipConfig.turnSpeed * input.turn;

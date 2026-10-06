@@ -33,8 +33,8 @@ export class ShipConfig
         let c = new ShipConfig();
         c.mass = 1;
         c.size = 0.1;
-        c.forwardThrustForce = 0.1;
-        c.backwardThrustForce = 0.1;
+        c.forwardThrustForce = 6;
+        c.backwardThrustForce = 6;
         c.thrustEnergyEfficiency = 1;
         c.turnSpeed = 4;
         c.turnAccel = 32;
